@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18-alpine'
+        }
+    }
 
     environment {
         DOCKER_IMAGE = 'diallof2/lab3-app'
