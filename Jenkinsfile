@@ -1,17 +1,13 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18-alpine'
-        }
-    }
-
-    environment {
-        DOCKER_IMAGE = 'diallof2/lab3-app'
-        IMAGE_TAG = "build-${BUILD_NUMBER}"
-    }
+    agent any
 
     stages {
         stage('Lint HTML') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                }
+            }
             steps {
                 echo 'Installing HTMLHint and linting index.html...'
                 sh 'npm install -g htmlhint'
@@ -22,7 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}:${IMAGE_TAG}")
+                    docker.build("diallof2/lab3-app:${BUILD_NUMBER}")
                 }
             }
         }
@@ -30,14 +26,14 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.image("${DOCKER_IMAGE}:${IMAGE_TAG}").push()
+                    docker.image("diallof2/lab3-app:${BUILD_NUMBER}").push()
                 }
             }
         }
 
         stage('Deploy to Dev') {
             steps {
-                sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
+                sh "sed -i 's|diallof2/lab3-app:latest|diallof2/lab3-app:${BUILD_NUMBER}|' deployment-dev.yaml"
                 sh "kubectl apply -f deployment-dev.yaml"
                 sh "kubectl apply -f ingress.yaml"
             }
