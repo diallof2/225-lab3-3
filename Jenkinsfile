@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'
-        DOCKER_IMAGE = 'diallof2/lab3-app'
-        IMAGE_TAG = "build-${BUILD_NUMBER}"
-        GITHUB_URL = 'https://github.com/diallof2/225-lab3-3.git'
-        KUBECONFIG = credentials('roseaw-225')
+        DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'                            // DockerHub credentials in Jenkins
+        DOCKER_IMAGE = 'diallof2/lab3-app'                                   // Your Docker image
+        IMAGE_TAG = "build-${BUILD_NUMBER}"                                  // Unique tag per build
+        GITHUB_URL = 'https://github.com/diallof2/225-lab3-3.git'            // Your GitHub repo
+        KUBECONFIG = credentials('roseaw-225')                               // Your kubeconfig credential ID
     }
 
     stages {
@@ -65,7 +65,7 @@ pipeline {
 
     post {
         always {
-            script {
+            node {
                 sh '''
                 curl -X POST -H 'Content-type: application/json' \
                 --data '{"text":"✅ Build Completed: ${JOB_NAME} #${BUILD_NUMBER}"}' \
