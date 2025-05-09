@@ -1,12 +1,12 @@
 pipeline {
-    agent any 
+    agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'  // your DockerHub Jenkins credential ID
-        DOCKER_IMAGE = 'diallof2/lab3-app'          // your DockerHub image name
+        DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'
+        DOCKER_IMAGE = 'diallof2/lab3-app'
         IMAGE_TAG = "build-${BUILD_NUMBER}"
-        GITHUB_URL = 'https://github.com/diallof2/225-lab3-3.git' // your repo
-        KUBECONFIG = credentials('diallof2-225')    // your Kubernetes secret (or comment out if not using this way)
+        GITHUB_URL = 'https://github.com/diallof2/225-lab3-3.git'
+        KUBECONFIG = credentials('roseaw-225')
     }
 
     stages {
@@ -49,30 +49,29 @@ pipeline {
                     def kubeConfig = readFile(KUBECONFIG)
                     sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
                     sh "kubectl apply -f deployment-dev.yaml"
+                    sh "kubectl apply -f ingress.yaml"
                 }
             }
         }
-        
+
         stage('Check Kubernetes Cluster') {
             steps {
-                script {
-                    sh "kubectl get pods"
-                    sh "kubectl get services"
-                    sh "kubectl get deploy"
-                }
+                sh "kubectl get pods"
+                sh "kubectl get services"
+                sh "kubectl get deploy"
             }
         }
     }
 
     post {
-        success {
-            slackSend color: "good", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-        }
-        unstable {
-            slackSend color: "warning", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-        }
-        failure {
-            slackSend color: "danger", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+        always {
+            script {
+                sh '''
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{"text":"✅ Build Completed: ${JOB_NAME} #${BUILD_NUMBER}"}' \
+                https://hooks.slack.com/services/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
+                '''
+            }
         }
     }
 }
