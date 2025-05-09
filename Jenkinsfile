@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'                            // DockerHub credentials in Jenkins
-        DOCKER_IMAGE = 'diallof2/lab3-app'                                   // Your Docker image
-        IMAGE_TAG = "build-${BUILD_NUMBER}"                                  // Unique tag per build
-        GITHUB_URL = 'https://github.com/diallof2/225-lab3-3.git'            // Your GitHub repo
-        KUBECONFIG = credentials('roseaw-225')                               // Your kubeconfig credential ID
+        DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'
+        DOCKER_IMAGE = 'diallof2/lab3-app'
+        IMAGE_TAG = "build-${BUILD_NUMBER}"
+        GITHUB_URL = 'https://github.com/diallof2/225-lab3-3.git'
+        KUBECONFIG = credentials('roseaw-225')
     }
 
     stages {
@@ -65,11 +65,15 @@ pipeline {
 
     post {
         always {
-            sh '''
-            curl -X POST -H 'Content-type: application/json' \
-            --data '{"text":"Build Completed: ${JOB_NAME} #${BUILD_NUMBER}"}' \
-            https://hooks.slack.com/services/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
-            '''
+            script {
+                node {
+                    sh '''
+                    curl -X POST -H 'Content-type: application/json' \
+                    --data '{"text":"Build Completed: ${JOB_NAME} #${BUILD_NUMBER}"}' \
+                    https://hooks.slack.com/services/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
+                    '''
+                }
+            }
         }
     }
 }
