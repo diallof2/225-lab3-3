@@ -67,11 +67,11 @@ pipeline {
         always {
             script {
                 node {
-                    sh '''
+                    sh """
                     curl -X POST -H 'Content-type: application/json' \
-                    --data '{"text":"Build Completed: ${JOB_NAME} #${BUILD_NUMBER}"}' \
+                    --data '{"text":"Build Completed: ${env.JOB_NAME} #${env.BUILD_NUMBER}"}' \
                     https://hooks.slack.com/services/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
-                    '''
+                    """
                 }
             }
         }
