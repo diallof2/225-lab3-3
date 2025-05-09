@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: cithit/roseaw:latest  #<-------change this to match your MiamiID.
+        image: diallof2/lab3-app:latest #<-------change this to match your MiamiID.
         ports:
         - containerPort: 80  # Expose NGINX on port 80      
 ---
@@ -24,7 +24,7 @@ metadata:
   name: nginx
 spec:
   rules: 
-  - host: 
+  - host: lab3.local
     http:
       paths:
       - path: /
