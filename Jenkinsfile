@@ -9,9 +9,12 @@ pipeline {
     stages {
         stage('Lint HTML') {
             steps {
-                sh 'npx htmlhint index.html'
+                echo 'Installing HTMLHint and linting index.html...'
+                sh 'npm install -g htmlhint'
+                sh 'htmlhint index.html'
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -19,6 +22,7 @@ pipeline {
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 script {
@@ -26,6 +30,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy to Dev') {
             steps {
                 sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
