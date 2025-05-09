@@ -63,15 +63,12 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            node {
-                sh '''
-                curl -X POST -H 'Content-type: application/json' \
-                --data '{"text":"✅ Build Completed: ${JOB_NAME} #${BUILD_NUMBER}"}' \
-                https://hooks.slack.com/services/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
-                '''
-            }
-        }
+   post {
+    always {
+        sh '''
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text":"Build Completed: ${JOB_NAME} #${BUILD_NUMBER}"}' \
+        https://hooks.slack.com/services/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
+        '''
     }
 }
